@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: covoiturage
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/covoiturage_db
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+
+logging:
+  level:
+    com.covoiturage: INFO
