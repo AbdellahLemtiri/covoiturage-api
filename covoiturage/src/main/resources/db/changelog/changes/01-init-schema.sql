@@ -1,4 +1,3 @@
-
 CREATE TABLE conducteurs
 (
     id            BIGSERIAL PRIMARY KEY,
