@@ -1,0 +1,18 @@
+$kind: http-request
+url: "{{baseUrl}}/vehicules"
+method: POST
+order: 1000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "marque": "Toyota",
+      "modele": "Corolla",
+      "immatriculation": "67890-B-26",
+      "couleur": "Gris",
+      "capacite": 4,
+      "conducteurId": 1
+    }

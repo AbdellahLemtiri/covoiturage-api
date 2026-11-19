@@ -1,0 +1,18 @@
+$kind: http-request
+url: "{{baseUrl}}/vehicules"
+method: POST
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "marque": "Mercedes",
+      "modele": "Sprinter",
+      "immatriculation": "99999-W-1",
+      "couleur": "Noir",
+      "capacite": 9,
+      "conducteurId": 1
+    }
