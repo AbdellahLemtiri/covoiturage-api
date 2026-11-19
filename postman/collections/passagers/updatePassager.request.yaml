@@ -1,0 +1,16 @@
+$kind: http-request
+url: "{{baseUrl}}/passagers/1"
+method: PUT
+order: 4000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nom": "Mansouri",
+      "prenom": "Salma",
+      "email": "salma.mansouri.updated@email.ma",
+      "telephone": "0671112233"
+    }

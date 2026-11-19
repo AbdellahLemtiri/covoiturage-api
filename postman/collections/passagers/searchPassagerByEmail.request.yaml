@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/passagers/search?email=salma.mansouri@email.ma"
+method: GET
+order: 5000

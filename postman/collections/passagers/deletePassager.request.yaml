@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/passagers/1"
+method: DELETE
+order: 7000
