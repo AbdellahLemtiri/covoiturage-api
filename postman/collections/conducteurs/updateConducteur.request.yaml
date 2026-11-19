@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{baseUrl}}/conducteurs/1"
+method: PUT
+order: 5000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nom": "Alami",
+      "prenom": "Hamid",
+      "email": "hamid.alami.updated@email.ma",
+      "telephone": "0661112233",
+      "numeroPermis": "PERMIS-1001"
+    }

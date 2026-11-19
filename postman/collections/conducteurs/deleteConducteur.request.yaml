@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/conducteurs/1"
+method: DELETE
+order: 7000
