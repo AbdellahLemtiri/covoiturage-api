@@ -69,8 +69,7 @@ public class VehiculeServiceImpl implements VehiculeService {
         validerCapacite(dto.capacite());
         Vehicule vehicule = getVehiculeOrThrow(id);
 
-        boolean immatPriseParAutre = vehiculeRepository.findAll().stream()
-                .anyMatch(v -> v.getImmatriculation().equalsIgnoreCase(dto.immatriculation()) && !v.getId().equals(id));
+        boolean immatPriseParAutre = vehiculeRepository.existsByImmatriculationIgnoreCaseAndIdNot(dto.immatriculation(), id);
         if (immatPriseParAutre) {
             log.warn("Modification véhicule id={} refusée : immatriculation {} déjà utilisée", id, dto.immatriculation());
             throw new BusinessRuleException("L'immatriculation est déjà utilisée par un autre véhicule");
