@@ -79,4 +79,45 @@ class TrajetServiceImplTest {
 
         departFutur = LocalDateTime.now().plusDays(3);
     }
+
+    @Test
+    @DisplayName("Cas nominal : Publication d'un trajet multi-étapes valide")
+    void publierTrajet_Succes() {
+        List<PointArretRequestDto> points = List.of(
+                new PointArretRequestDto("Rabat", 0, departFutur, BigDecimal.ZERO),
+                new PointArretRequestDto("Casablanca", 1, departFutur.plusHours(1), new BigDecimal("40.00")),
+                new PointArretRequestDto("Marrakech", 2, departFutur.plusHours(4), new BigDecimal("120.00"))
+        );
+        TrajetRequestDto request = new TrajetRequestDto(1L, 10L, 3, points);
+
+        when(conducteurRepository.findById(1L)).thenReturn(Optional.of(hamid));
+        when(vehiculeRepository.findById(10L)).thenReturn(Optional.of(daciaLogan));
+        when(trajetMapper.toPointArretEntity(any())).thenAnswer(inv -> {
+            PointArretRequestDto p = inv.getArgument(0);
+            return PointArret.builder()
+                    .ville(p.ville())
+                    .ordre(p.ordre())
+                    .heurePassage(p.heurePassage())
+                    .prixDepuisDepart(p.prixDepuisDepart())
+                    .build();
+        });
+        when(trajetRepository.save(any(Trajet.class))).thenAnswer(inv -> {
+            Trajet t = inv.getArgument(0);
+            t.setId(100L);
+            return t;
+        });
+        when(trajetMapper.toResponseDto(any(Trajet.class), eq(3), isNull()))
+                .thenReturn(new TrajetResponseDto(
+                        100L, 1L, "Hamid Alami", 10L, "Dacia Logan",
+                        "Rabat", "Marrakech", departFutur, 3, 3, null, StatutTrajet.PUBLIE, List.of()
+                ));
+
+        TrajetResponseDto response = trajetService.create(request);
+
+        assertThat(response).isNotNull();
+        assertThat(response.villeDepart()).isEqualTo("Rabat");
+        assertThat(response.villeArrivee()).isEqualTo("Marrakech");
+        assertThat(response.statut()).isEqualTo(StatutTrajet.PUBLIE);
+        verify(trajetRepository, times(1)).save(any(Trajet.class));
+    }
 }
