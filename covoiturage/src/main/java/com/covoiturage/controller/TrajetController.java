@@ -57,4 +57,20 @@ public class TrajetController {
     ) {
         return ResponseEntity.ok(trajetService.reservationsTrajet(id, conducteurId));
     }
+
+    @PatchMapping("/{id}/terminer")
+    public ResponseEntity<TrajetResponseDto> terminerTrajet(
+            @PathVariable Long id,
+            @RequestParam Long conducteurId
+    ) {
+        return ResponseEntity.ok(trajetService.terminerTrajet(id, conducteurId));
+    }
+
+    @PatchMapping("/{id}/annuler")
+    public ResponseEntity<TrajetResponseDto> annulerTrajet(
+            @PathVariable Long id,
+            @RequestParam Long conducteurId
+    ) {
+        return ResponseEntity.ok(trajetService.annulerTrajet(id, conducteurId));
+    }
 }
