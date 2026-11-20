@@ -10,5 +10,7 @@ public interface PassagerRepository extends JpaRepository<Passager,Long> {
     boolean existsByEmailIgnoreCase(String email);
 
     Optional<Passager> findByEmailIgnoreCase(String email);
+    
+    boolean existsByEmailIgnoreCaseAndIdNot(String email, Long id);
 
 }
