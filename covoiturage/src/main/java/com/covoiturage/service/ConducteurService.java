@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ConducteurService {
 
-    ConducteurResponseDto creat(ConducteurRequestDto conducteurRequestDto);
+    ConducteurResponseDto create(ConducteurRequestDto conducteurRequestDto);
 
     ConducteurResponseDto findById(Long id);
 
