@@ -97,8 +97,13 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ReservationResponseDto> findByPassager(Long passagerId) {
-        throw new UnsupportedOperationException();
+        if (!passagerRepository.existsById(passagerId)) {
+            throw new ResourceNotFoundException("Passager introuvable avec l'id : " + passagerId);
+        }
+
+        return reservationRepository.findByPassagerIdWithDetails(passagerId).stream().map(res -> reservationMapper.toResponseDto(res, calculerPlacesRestantes(res.getTrajet()))).toList();
     }
 
     @Override
