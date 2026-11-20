@@ -107,8 +107,13 @@ public class TrajetServiceImpl implements TrajetService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public TrajetResponseDto findByIdWithDetails(Long id) {
-        throw new UnsupportedOperationException();
+        Trajet trajet = trajetRepository.findByIdWithDetails(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Trajet introuvable avec l'id : " + id));
+
+        int placesRestantes = calculerPlacesRestantes(trajet);
+        return trajetMapper.toResponseDto(trajet, placesRestantes, null);
     }
 
     @Override
@@ -173,5 +178,10 @@ public class TrajetServiceImpl implements TrajetService {
                 }
             }
         }
+    }
+
+    private int calculerPlacesRestantes(Trajet trajet) {
+        int placesOccupees = reservationRepository.sumPlacesConfirmeesByTrajetId(trajet.getId());
+        return trajet.getPlacesProposees() - placesOccupees;
     }
 }
