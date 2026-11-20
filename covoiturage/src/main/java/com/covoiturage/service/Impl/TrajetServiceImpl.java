@@ -117,8 +117,34 @@ public class TrajetServiceImpl implements TrajetService {
     }
 
     @Override
-    public Page<TrajetResponseDto> searchTrajets(String depart, String arrivee, LocalDate date, BigDecimal prixMax, Integer placesMin, Pageable pageable) {
-        throw new UnsupportedOperationException();
+    @Transactional(readOnly = true)
+    public Page<TrajetResponseDto> searchTrajets(
+            String depart,
+            String arrivee,
+            LocalDate date,
+            BigDecimal prixMax,
+            Integer placesMin,
+            Pageable pageable
+    ) {
+        int placesDemandees = (placesMin == null || placesMin < 1) ? 1 : placesMin;
+        LocalDateTime debutJournee = date.atStartOfDay();
+        LocalDateTime finJournee = date.atTime(LocalTime.MAX);
+
+        Page<Trajet> pageTrajets = trajetRepository.searchTrajets(
+                depart.trim(),
+                arrivee.trim(),
+                debutJournee,
+                finJournee,
+                prixMax,
+                placesDemandees,
+                pageable
+        );
+
+        return pageTrajets.map(trajet -> {
+            int placesRestantes = calculerPlacesRestantes(trajet);
+            BigDecimal prixSegment = calculerPrixSegmentDepuisPoints(trajet, depart.trim(), arrivee.trim());
+            return trajetMapper.toResponseDto(trajet, placesRestantes, prixSegment);
+        });
     }
 
     @Override
@@ -183,5 +209,26 @@ public class TrajetServiceImpl implements TrajetService {
     private int calculerPlacesRestantes(Trajet trajet) {
         int placesOccupees = reservationRepository.sumPlacesConfirmeesByTrajetId(trajet.getId());
         return trajet.getPlacesProposees() - placesOccupees;
+    }
+
+    private BigDecimal calculerPrixSegmentDepuisPoints(Trajet trajet, String villeDepart, String villeArrivee) {
+        PointArret pDepart = null;
+        PointArret pArrivee = null;
+
+        for (PointArret pa : trajet.getPointsArret()) {
+            if (pa.getVille().equalsIgnoreCase(villeDepart)) {
+                pDepart = pa;
+            } else if (pa.getVille().equalsIgnoreCase(villeArrivee) && pDepart != null) {
+                pArrivee = pa;
+                break;
+            }
+        }
+
+        if (pDepart == null || pArrivee == null) {
+            return null;
+        }
+        return pArrivee.getPrixDepuisDepart()
+                .subtract(pDepart.getPrixDepuisDepart())
+                .setScale(2, java.math.RoundingMode.HALF_UP);
     }
 }
