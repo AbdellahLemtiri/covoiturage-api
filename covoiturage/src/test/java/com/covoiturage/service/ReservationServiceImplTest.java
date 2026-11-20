@@ -153,4 +153,25 @@ class ReservationServiceImplTest {
 
         verify(reservationRepository, never()).save(any());
     }
+
+    @Test
+    @DisplayName("Annulation 3 jours avant le départ -> Réservation ANNULEE et trajet redevient PUBLIE")
+    void annulerReservation_Scenario5_Succes() {
+        trajetHamid.setStatut(StatutTrajet.COMPLET);
+        Reservation reservationKarim = Reservation.builder()
+                .id(501L)
+                .passager(karim)
+                .trajet(trajetHamid)
+                .nombrePlaces(2)
+                .statut(StatutReservation.CONFIRMEE)
+                .build();
+
+        when(reservationRepository.findById(501L)).thenReturn(Optional.of(reservationKarim));
+
+        reservationService.annulerReservation(501L, 2L);
+
+        assertThat(reservationKarim.getStatut()).isEqualTo(StatutReservation.ANNULEE);
+        assertThat(trajetHamid.getStatut()).isEqualTo(StatutTrajet.PUBLIE);
+        verify(trajetRepository).save(trajetHamid);
+    }
 }
