@@ -99,4 +99,26 @@ class ReservationServiceImplTest {
         assertThat(trajetHamid.getStatut()).isEqualTo(StatutTrajet.PUBLIE);
         verify(reservationMapper).toResponseDto(any(Reservation.class), eq(2));
     }
+
+    @Test
+    @DisplayName("Karim réserve les 2 dernières places -> Le trajet devient COMPLET")
+    void reserverPlaces_Scenario3_TrajetDevientComplet() {
+        ReservationRequestDto dto = new ReservationRequestDto(2L, 100L, "Casablanca", "Marrakech", 2);
+
+        when(passagerRepository.findById(2L)).thenReturn(Optional.of(karim));
+        when(trajetRepository.findByIdWithDetails(100L)).thenReturn(Optional.of(trajetHamid));
+        when(reservationRepository.existsByPassagerIdAndTrajetIdAndStatut(2L, 100L, StatutReservation.CONFIRMEE))
+                .thenReturn(false);
+        when(reservationRepository.sumPlacesConfirmeesByTrajetId(100L)).thenReturn(1);
+        when(reservationRepository.save(any(Reservation.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        reservationService.reserver(dto);
+
+        verify(reservationRepository).save(argThat(res ->
+                res.getMontantTotal().compareTo(new BigDecimal("160.00")) == 0 &&
+                        res.getStatut() == StatutReservation.CONFIRMEE
+        ));
+        assertThat(trajetHamid.getStatut()).isEqualTo(StatutTrajet.COMPLET);
+        verify(trajetRepository).save(trajetHamid);
+    }
 }
