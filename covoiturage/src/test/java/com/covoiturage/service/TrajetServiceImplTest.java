@@ -120,4 +120,44 @@ class TrajetServiceImplTest {
         assertThat(response.statut()).isEqualTo(StatutTrajet.PUBLIE);
         verify(trajetRepository, times(1)).save(any(Trajet.class));
     }
+
+    @Test
+    @DisplayName("Refus si places proposées > capacité du véhicule")
+    void publierTrajet_PlacesSuperieuresCapacite_ThrowsBadRequest() {
+        List<PointArretRequestDto> points = List.of(
+                new PointArretRequestDto("Rabat", 0, departFutur, BigDecimal.ZERO),
+                new PointArretRequestDto("Marrakech", 1, departFutur.plusHours(4), new BigDecimal("120.00"))
+        );
+        TrajetRequestDto request = new TrajetRequestDto(1L, 10L, 5, points);
+
+        when(conducteurRepository.findById(1L)).thenReturn(Optional.of(hamid));
+        when(vehiculeRepository.findById(10L)).thenReturn(Optional.of(daciaLogan));
+
+        assertThatThrownBy(() -> trajetService.create(request))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("compris entre 1 et 4");
+
+        verify(trajetRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Refus si le conducteur utilise le véhicule d'un autre conducteur")
+    void publierTrajet_VehiculeAutreConducteur_ThrowsForbidden() {
+        Conducteur autreConducteur = Conducteur.builder().id(2L).nom("Autre").build();
+        Vehicule vehiculeAutre = Vehicule.builder().id(20L).capacite(4).conducteur(autreConducteur).build();
+
+        List<PointArretRequestDto> points = List.of(
+                new PointArretRequestDto("Rabat", 0, departFutur, BigDecimal.ZERO),
+                new PointArretRequestDto("Marrakech", 1, departFutur.plusHours(4), new BigDecimal("120.00"))
+        );
+        TrajetRequestDto request = new TrajetRequestDto(1L, 20L, 3, points);
+
+        when(conducteurRepository.findById(1L)).thenReturn(Optional.of(hamid));
+        when(vehiculeRepository.findById(20L)).thenReturn(Optional.of(vehiculeAutre));
+
+        assertThatThrownBy(() -> trajetService.create(request))
+                .isInstanceOf(ForbiddenActionException.class);
+
+        verify(trajetRepository, never()).save(any());
+    }
 }
