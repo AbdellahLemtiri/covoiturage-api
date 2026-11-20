@@ -39,11 +39,12 @@ import com.covoiturage.service.TrajetService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
+
+
 public class TrajetServiceImpl implements TrajetService {
 
     private final TrajetRepository trajetRepository;
@@ -106,6 +107,9 @@ public class TrajetServiceImpl implements TrajetService {
         return trajetMapper.toResponseDto(saved, saved.getPlacesProposees(), null);
     }
 
+
+
+
     @Override
     @Transactional(readOnly = true)
     public TrajetResponseDto findByIdWithDetails(Long id) {
@@ -115,6 +119,10 @@ public class TrajetServiceImpl implements TrajetService {
         int placesRestantes = calculerPlacesRestantes(trajet);
         return trajetMapper.toResponseDto(trajet, placesRestantes, null);
     }
+
+
+
+
 
     @Override
     @Transactional(readOnly = true)
@@ -147,6 +155,9 @@ public class TrajetServiceImpl implements TrajetService {
         });
     }
 
+
+
+
     @Override
     @Transactional(readOnly = true)
     public List<ReservationResponseDto> reservationsTrajet(Long trajetId, Long conducteurId) {
@@ -163,6 +174,9 @@ public class TrajetServiceImpl implements TrajetService {
                 .map(res -> reservationMapper.toResponseDto(res, placesRestantes))
                 .toList();
     }
+
+
+
 
     @Override
     public TrajetResponseDto terminerTrajet(Long trajetId, Long conducteurId) {
@@ -185,11 +199,35 @@ public class TrajetServiceImpl implements TrajetService {
         return trajetMapper.toResponseDto(updated, calculerPlacesRestantes(updated), null);
     }
 
+
+
+
     @Override
     public TrajetResponseDto annulerTrajet(Long trajetId, Long conducteurId) {
-        throw new UnsupportedOperationException();
+        Trajet trajet = trajetRepository.findByIdWithDetails(trajetId)
+                .orElseThrow(() -> new ResourceNotFoundException("Trajet introuvable avec l'id : " + trajetId));
+
+        verifierProprietaire(trajet, conducteurId);
+        verifierStatutModifiable(trajet);
+
+        trajet.setStatut(StatutTrajet.ANNULE);
+        trajet.getReservations().stream()
+                .filter(r -> r.getStatut() == StatutReservation.CONFIRMEE)
+                .forEach(r -> r.setStatut(StatutReservation.ANNULEE));
+
+        Trajet updated = trajetRepository.save(trajet);
+        int placesRestantes = calculerPlacesRestantes(updated);
+        log.info("Trajet id={} annule avec toutes ses reservations confirmees", trajetId);
+
+        return trajetMapper.toResponseDto(updated, placesRestantes, null);
     }
 
+
+
+
+
+
+    ///////////////////////////////////utils///////////////////////////////////////
     private void validerPointsArret(List<PointArretRequestDto> points) {
         if (points.size() < 2) {
             throw new BadRequestException("Un trajet doit contenir au moins deux points d'arret");
