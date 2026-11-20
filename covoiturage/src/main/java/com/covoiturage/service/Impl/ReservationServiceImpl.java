@@ -83,8 +83,17 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ReservationResponseDto consulterReservation(Long id, Long passagerId) {
-        throw new UnsupportedOperationException();
+        Reservation reservation = reservationRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Réservation introuvable avec l'id : " + id));
+
+        if (!reservation.getPassager().getId().equals(passagerId)) {
+            log.warn("Consultation réservation refusée  passager id={} sur réservation id={}", passagerId, id);
+            throw new ForbiddenActionException("Vous ne pouvez consulter que vos propres réservations");
+        }
+
+        int placesRestantes = calculerPlacesRestantes(reservation.getTrajet());
+        return reservationMapper.toResponseDto(reservation, placesRestantes);
     }
 
     @Override
@@ -99,5 +108,10 @@ public class ReservationServiceImpl implements ReservationService {
 
     private PointArret trouverPointArretParVille(Trajet trajet, String ville, String typePoint) {
         return trajet.getPointsArret().stream().filter(pa -> pa.getVille().equalsIgnoreCase(ville.trim())).findFirst().orElseThrow(() -> new BadRequestException("La ville de " + typePoint + " '" + ville + "' ne fait pas partie du parcours de ce trajet"));
+    }
+
+    private int calculerPlacesRestantes(Trajet trajet) {
+        int placesOccupees = reservationRepository.sumPlacesConfirmeesByTrajetId(trajet.getId());
+        return trajet.getPlacesProposees() - placesOccupees;
     }
 }
