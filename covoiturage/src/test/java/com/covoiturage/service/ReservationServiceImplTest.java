@@ -77,4 +77,26 @@ class ReservationServiceImplTest {
                 .pointsArret(List.of(rabat, casa, settat, marrakech))
                 .build();
     }
+
+    @Test
+    @DisplayName("Salma réserve 1 place Settat -> Marrakech (Montant = 50.00 DH, 2 places restantes)")
+    void reserverPlaces_Scenario1_Succes() {
+        ReservationRequestDto dto = new ReservationRequestDto(1L, 100L, "Settat", "Marrakech", 1);
+
+        when(passagerRepository.findById(1L)).thenReturn(Optional.of(salma));
+        when(trajetRepository.findByIdWithDetails(100L)).thenReturn(Optional.of(trajetHamid));
+        when(reservationRepository.existsByPassagerIdAndTrajetIdAndStatut(1L, 100L, StatutReservation.CONFIRMEE))
+                .thenReturn(false);
+        when(reservationRepository.sumPlacesConfirmeesByTrajetId(100L)).thenReturn(0);
+        when(reservationRepository.save(any(Reservation.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        reservationService.reserver(dto);
+
+        verify(reservationRepository).save(argThat(res ->
+                res.getMontantTotal().compareTo(new BigDecimal("50.00")) == 0 &&
+                        res.getStatut() == StatutReservation.CONFIRMEE
+        ));
+        assertThat(trajetHamid.getStatut()).isEqualTo(StatutTrajet.PUBLIE);
+        verify(reservationMapper).toResponseDto(any(Reservation.class), eq(2));
+    }
 }
