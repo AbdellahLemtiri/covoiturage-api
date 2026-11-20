@@ -20,7 +20,7 @@ public class ConducteurController {
 
     @PostMapping
     public ResponseEntity<ConducteurResponseDto> creat(@Valid @RequestBody ConducteurRequestDto dto) {
-        ConducteurResponseDto created = conducteurService.creat(dto);
+        ConducteurResponseDto created = conducteurService.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
