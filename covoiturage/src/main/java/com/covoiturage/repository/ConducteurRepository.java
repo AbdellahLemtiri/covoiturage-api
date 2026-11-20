@@ -12,4 +12,7 @@ public interface ConducteurRepository extends JpaRepository<Conducteur, Long> {
     boolean existsByNumeroPermisIgnoreCase(String numeroPermis);
 
     List<Conducteur> findByNomContainingIgnoreCaseOrEmailContainingIgnoreCase(String nom, String email);
+
+    boolean existsByEmailIgnoreCaseAndIdNot(String email, Long id);
+    boolean existsByNumeroPermisIgnoreCaseAndIdNot(String numeroPermis, Long id);
 }
