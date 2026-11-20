@@ -148,8 +148,20 @@ public class TrajetServiceImpl implements TrajetService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ReservationResponseDto> reservationsTrajet(Long trajetId, Long conducteurId) {
-        throw new UnsupportedOperationException();
+        Trajet trajet = trajetRepository.findByIdWithDetails(trajetId)
+                .orElseThrow(() -> new ResourceNotFoundException("Trajet introuvable avec l'id : " + trajetId));
+
+        if (!trajet.getConducteur().getId().equals(conducteurId)) {
+            log.warn("Consultation reservations refusee  conducteur id={} sur trajet id={}", conducteurId, trajetId);
+            throw new ForbiddenActionException("Vous ne pouvez consulter que les reservations de vos propres trajets");
+        }
+
+        int placesRestantes = calculerPlacesRestantes(trajet);
+        return trajet.getReservations().stream()
+                .map(res -> reservationMapper.toResponseDto(res, placesRestantes))
+                .toList();
     }
 
     @Override
@@ -203,6 +215,14 @@ public class TrajetServiceImpl implements TrajetService {
                     throw new BadRequestException("Le prix depuis le depart doit etre strictement croissant");
                 }
             }
+        }
+    }
+
+    private void verifierProprietaire(Trajet trajet, Long conducteurId) {
+        if (!trajet.getConducteur().getId().equals(conducteurId)) {
+            log.warn("Action refusee: conducteur id={} n'est pas proprietaire du trajet id={}",
+                    conducteurId, trajet.getId());
+            throw new ForbiddenActionException("Action refusee : vous n'etes pas le conducteur de ce trajet");
         }
     }
 
