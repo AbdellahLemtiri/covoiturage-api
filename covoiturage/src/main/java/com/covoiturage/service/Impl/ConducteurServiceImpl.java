@@ -23,7 +23,7 @@ public class ConducteurServiceImpl implements ConducteurService {
     private final ConducteurRepository conducteurRepository;
 
     @Override
-    public ConducteurResponseDto creat(ConducteurRequestDto dto) {
+    public ConducteurResponseDto create(ConducteurRequestDto dto) {
         if (conducteurRepository.existsByEmailIgnoreCase(dto.email())) {
             throw new BusinessRuleException("L'email est déjà utilisé !, merci de changer");
         }
@@ -58,15 +58,13 @@ public class ConducteurServiceImpl implements ConducteurService {
                 .orElseThrow(() -> new ResourceNotFoundException("Conducteur introuvable avec l'identifiant : " + id));
 
 
-        boolean emailExists = conducteurRepository.findAll().stream()
-                .anyMatch(c -> c.getEmail().equalsIgnoreCase(dto.email()) && !c.getId().equals(id));
+        boolean emailExists = conducteurRepository.existsByEmailIgnoreCaseAndIdNot(dto.email(), id);
         if (emailExists) {
             throw new BusinessRuleException("L'email est déjà utilisé par un autre conducteur !");
         }
 
 
-        boolean permisExists = conducteurRepository.findAll().stream()
-                .anyMatch(c -> c.getNumeroPermis().equalsIgnoreCase(dto.numeroPermis()) && !c.getId().equals(id));
+        boolean permisExists = conducteurRepository.existsByNumeroPermisIgnoreCaseAndIdNot(conducteur.getNumeroPermis(), id);
         if (permisExists) {
             throw new BusinessRuleException("Le numéro de permis est déjà utilisé par un autre conducteur !");
         }
