@@ -31,15 +31,19 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+
 public class ReservationServiceImpl implements ReservationService {
+
 
     private final ReservationRepository reservationRepository;
     private final PassagerRepository passagerRepository;
     private final TrajetRepository trajetRepository;
     private final ReservationMapper reservationMapper;
 
+
     @Override
     public ReservationResponseDto reserver(ReservationRequestDto dto) {
+
         Passager passager = passagerRepository.findById(dto.passagerId()).orElseThrow(() -> new ResourceNotFoundException("Passager introuvable avec l'id : " + dto.passagerId()));
 
         Trajet trajet = trajetRepository.findByIdWithDetails(dto.trajetId()).orElseThrow(() -> new ResourceNotFoundException("Trajet introuvable avec l'id : " + dto.trajetId()));
@@ -66,6 +70,7 @@ public class ReservationServiceImpl implements ReservationService {
 
         BigDecimal montantTotal = prixUnitaire.multiply(BigDecimal.valueOf(dto.nombrePlaces())).setScale(2, RoundingMode.HALF_UP);
 
+
         Reservation reservation = Reservation.builder().passager(passager).trajet(trajet).pointMontee(pointMontee).pointDescente(pointDescente).nombrePlaces(dto.nombrePlaces()).montantTotal(montantTotal).dateReservation(LocalDateTime.now()).statut(StatutReservation.CONFIRMEE).build();
 
         Reservation savedReservation = reservationRepository.save(reservation);
@@ -80,7 +85,9 @@ public class ReservationServiceImpl implements ReservationService {
         log.info("Réservation créée (id={}, passagerId={}, trajetId={}, segment={}->{}, montant={} DH)", savedReservation.getId(), passager.getId(), trajet.getId(), pointMontee.getVille(), pointDescente.getVille(), montantTotal);
 
         return reservationMapper.toResponseDto(savedReservation, nouvellesPlacesRestantes);
+
     }
+
 
     @Override
     @Transactional(readOnly = true)
@@ -96,6 +103,7 @@ public class ReservationServiceImpl implements ReservationService {
         return reservationMapper.toResponseDto(reservation, placesRestantes);
     }
 
+
     @Override
     @Transactional(readOnly = true)
     public List<ReservationResponseDto> findByPassager(Long passagerId) {
@@ -106,10 +114,40 @@ public class ReservationServiceImpl implements ReservationService {
         return reservationRepository.findByPassagerIdWithDetails(passagerId).stream().map(res -> reservationMapper.toResponseDto(res, calculerPlacesRestantes(res.getTrajet()))).toList();
     }
 
+
     @Override
     public void annulerReservation(Long reservationId, Long passagerId) {
-        throw new UnsupportedOperationException();
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(() -> new ResourceNotFoundException("Réservation introuvable avec l'id : " + reservationId));
+        if (!reservation.getPassager().getId().equals(passagerId)) {
+            log.warn("Annulation réservation refusée  passager id={} sur réservation id={}", passagerId, reservationId);
+            throw new ForbiddenActionException("Vous ne pouvez annuler que vos propres réservations");
+        }
+        if (reservation.getStatut() == StatutReservation.ANNULEE) {
+            throw new BusinessRuleException("Cette réservation est déjà annulée");
+        }
+        Trajet trajet = reservation.getTrajet();
+
+        if (LocalDateTime.now().isAfter(trajet.getDateDepart().minusHours(24))) {
+            log.warn("Annulation réservation id={} refusée délai de 24h dépassé (départ={})", reservationId, trajet.getDateDepart());
+            throw new BusinessRuleException("Annulation impossible : le délai de 24 heures avant le départ est dépassé");
+
+        }
+
+        reservation.setStatut(StatutReservation.ANNULEE);
+        reservationRepository.save(reservation);
+
+        if (trajet.getStatut() == StatutTrajet.COMPLET) {
+            trajet.setStatut(StatutTrajet.PUBLIE);
+            trajetRepository.save(trajet);
+            log.info("Le trajet id={} est repassé au statut PUBLIE", trajet.getId());
+        }
+
+        log.info("Réservation id={} annulée avec succès par passager id={}", reservationId, passagerId);
+
     }
+
+
+    /// //////////utils////////////////////////
 
     private PointArret trouverPointArretParVille(Trajet trajet, String ville, String typePoint) {
         return trajet.getPointsArret().stream().filter(pa -> pa.getVille().equalsIgnoreCase(ville.trim())).findFirst().orElseThrow(() -> new BadRequestException("La ville de " + typePoint + " '" + ville + "' ne fait pas partie du parcours de ce trajet"));
@@ -119,4 +157,5 @@ public class ReservationServiceImpl implements ReservationService {
         int placesOccupees = reservationRepository.sumPlacesConfirmeesByTrajetId(trajet.getId());
         return trajet.getPlacesProposees() - placesOccupees;
     }
+
 }
