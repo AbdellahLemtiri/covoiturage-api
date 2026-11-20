@@ -121,4 +121,36 @@ class ReservationServiceImplTest {
         assertThat(trajetHamid.getStatut()).isEqualTo(StatutTrajet.COMPLET);
         verify(trajetRepository).save(trajetHamid);
     }
+
+    @Test
+    @DisplayName("Refus de réserver sur un trajet COMPLET")
+    void reserverPlaces_Scenario4_TrajetComplet_ThrowsConflict() {
+        trajetHamid.setStatut(StatutTrajet.COMPLET);
+        ReservationRequestDto dto = new ReservationRequestDto(1L, 100L, "Rabat", "Marrakech", 1);
+
+        when(passagerRepository.findById(1L)).thenReturn(Optional.of(salma));
+        when(trajetRepository.findByIdWithDetails(100L)).thenReturn(Optional.of(trajetHamid));
+
+        assertThatThrownBy(() -> reservationService.reserver(dto))
+                .isInstanceOf(BusinessRuleException.class);
+
+        verify(reservationRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Refus si la montée est après la descente (Marrakech -> Settat)")
+    void reserverPlaces_Scenario6_MauvaisSens_ThrowsBadRequest() {
+        ReservationRequestDto dto = new ReservationRequestDto(1L, 100L, "Marrakech", "Settat", 1);
+
+        when(passagerRepository.findById(1L)).thenReturn(Optional.of(salma));
+        when(trajetRepository.findByIdWithDetails(100L)).thenReturn(Optional.of(trajetHamid));
+        when(reservationRepository.existsByPassagerIdAndTrajetIdAndStatut(1L, 100L, StatutReservation.CONFIRMEE))
+                .thenReturn(false);
+
+        assertThatThrownBy(() -> reservationService.reserver(dto))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("avant le point de descente");
+
+        verify(reservationRepository, never()).save(any());
+    }
 }
