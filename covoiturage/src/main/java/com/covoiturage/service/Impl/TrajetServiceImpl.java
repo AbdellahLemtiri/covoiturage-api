@@ -166,7 +166,23 @@ public class TrajetServiceImpl implements TrajetService {
 
     @Override
     public TrajetResponseDto terminerTrajet(Long trajetId, Long conducteurId) {
-        throw new UnsupportedOperationException();
+        Trajet trajet = trajetRepository.findByIdWithDetails(trajetId)
+                .orElseThrow(() -> new ResourceNotFoundException("Trajet introuvable avec l'id : " + trajetId));
+
+        verifierProprietaire(trajet, conducteurId);
+        verifierStatutModifiable(trajet);
+
+        if (LocalDateTime.now().isBefore(trajet.getDateDepart())) {
+            log.warn("Fin trajet id={} refusee  heure actuelle avant dateDepart ({})",
+                    trajetId, trajet.getDateDepart());
+            throw new BusinessRuleException("Impossible de terminer le trajet avant son heure de depart prevue");
+        }
+
+        trajet.setStatut(StatutTrajet.TERMINE);
+        Trajet updated = trajetRepository.save(trajet);
+        log.info("Trajet id={} marque comme TERMINE par conducteur id={}", trajetId, conducteurId);
+
+        return trajetMapper.toResponseDto(updated, calculerPlacesRestantes(updated), null);
     }
 
     @Override
@@ -223,6 +239,14 @@ public class TrajetServiceImpl implements TrajetService {
             log.warn("Action refusee: conducteur id={} n'est pas proprietaire du trajet id={}",
                     conducteurId, trajet.getId());
             throw new ForbiddenActionException("Action refusee : vous n'etes pas le conducteur de ce trajet");
+        }
+    }
+
+    private void verifierStatutModifiable(Trajet trajet) {
+        if (trajet.getStatut() == StatutTrajet.TERMINE || trajet.getStatut() == StatutTrajet.ANNULE) {
+            log.warn("Modification refusee (409) : trajet id={} est dejà dans un etat final ({})",
+                    trajet.getId(), trajet.getStatut());
+            throw new BusinessRuleException("Impossible de modifier un trajet dejà TERMINe ou ANNULE");
         }
     }
 
