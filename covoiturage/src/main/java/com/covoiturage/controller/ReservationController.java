@@ -30,4 +30,17 @@ public class ReservationController {
             @RequestParam Long passagerId) {
         return ResponseEntity.ok(reservationService.consulterReservation(id, passagerId));
     }
+
+    @GetMapping("/passager/{passagerId}")
+    public ResponseEntity<List<ReservationResponseDto>> consulterMesReservations(@PathVariable Long passagerId) {
+        return ResponseEntity.ok(reservationService.findByPassager(passagerId));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> annulerReservation(
+            @PathVariable Long id,
+            @RequestParam Long passagerId) {
+        reservationService.annulerReservation(id, passagerId);
+        return ResponseEntity.noContent().build();
+    }
 }
