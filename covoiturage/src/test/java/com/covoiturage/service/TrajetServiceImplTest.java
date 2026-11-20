@@ -160,4 +160,50 @@ class TrajetServiceImplTest {
 
         verify(trajetRepository, never()).save(any());
     }
+
+    @Test
+    @DisplayName("Refus de terminer un trajet avant son heure de départ")
+    void terminerTrajet_AvantHeureDepart_ThrowsConflict() {
+        Trajet trajet = Trajet.builder()
+                .id(100L)
+                .conducteur(hamid)
+                .dateDepart(LocalDateTime.now().plusHours(2))
+                .statut(StatutTrajet.PUBLIE)
+                .build();
+
+        when(trajetRepository.findByIdWithDetails(100L)).thenReturn(Optional.of(trajet));
+
+        assertThatThrownBy(() -> trajetService.terminerTrajet(100L, 1L))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessageContaining("avant son heure de départ");
+
+        verify(trajetRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Annulation d'un trajet annule toutes ses réservations confirmées en bloc")
+    void annulerTrajet_AnnuleToutesReservationsConfirmees() {
+        Reservation res1 = Reservation.builder().id(1L).statut(StatutReservation.CONFIRMEE).nombrePlaces(1).build();
+        Reservation res2 = Reservation.builder().id(2L).statut(StatutReservation.CONFIRMEE).nombrePlaces(2).build();
+
+        Trajet trajet = Trajet.builder()
+                .id(100L)
+                .conducteur(hamid)
+                .placesProposees(3)
+                .dateDepart(departFutur)
+                .statut(StatutTrajet.COMPLET)
+                .reservations(List.of(res1, res2))
+                .build();
+
+        when(trajetRepository.findByIdWithDetails(100L)).thenReturn(Optional.of(trajet));
+        when(trajetRepository.save(any(Trajet.class))).thenReturn(trajet);
+        when(reservationRepository.sumPlacesConfirmeesByTrajetId(100L)).thenReturn(0);
+
+        trajetService.annulerTrajet(100L, 1L);
+
+        assertThat(trajet.getStatut()).isEqualTo(StatutTrajet.ANNULE);
+        assertThat(res1.getStatut()).isEqualTo(StatutReservation.ANNULEE);
+        assertThat(res2.getStatut()).isEqualTo(StatutReservation.ANNULEE);
+        verify(trajetRepository, times(1)).save(trajet);
+    }
 }
