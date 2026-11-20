@@ -174,4 +174,25 @@ class ReservationServiceImplTest {
         assertThat(trajetHamid.getStatut()).isEqualTo(StatutTrajet.PUBLIE);
         verify(trajetRepository).save(trajetHamid);
     }
+
+    @Test
+    @DisplayName("Refus d'annulation 2 heures avant le départ (délai de 24h dépassé)")
+    void annulerReservation_Scenario10_DelaiDepasse_ThrowsConflict() {
+        trajetHamid.setDateDepart(LocalDateTime.now().plusHours(2));
+        Reservation reservationSalma = Reservation.builder()
+                .id(500L)
+                .passager(salma)
+                .trajet(trajetHamid)
+                .nombrePlaces(1)
+                .statut(StatutReservation.CONFIRMEE)
+                .build();
+
+        when(reservationRepository.findById(500L)).thenReturn(Optional.of(reservationSalma));
+
+        assertThatThrownBy(() -> reservationService.annulerReservation(500L, 1L))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessageContaining("24 heures");
+
+        verify(reservationRepository, never()).save(any());
+    }
 }
