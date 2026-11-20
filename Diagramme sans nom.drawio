@@ -1,6 +1,6 @@
 <mxfile host="Electron">
   <diagram name="Page-1" id="2Q9oHJ7FRgmj38P95mjI">
-    <mxGraphModel dx="1209" dy="688" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="2538" dy="1444" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -41,7 +41,7 @@
         </UserObject>
         <UserObject label="StatutReservation" plantUmlId="cls_8" plantUmlBaseStyle="swimlane;collapsible=0;fontStyle=0;align=center;fontSize=14;fontColor=#0F172A;startSize=26;spacingLeft=0;fillColor=#F8FAFC;strokeColor=#334155;childLayout=stackLayout;horizontal=1;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;marginBottom=0;stackSpacing=0;marginTop=5.5;shadow=0;swimlaneFillColor=#F8FAFC;" plantUmlBaseValue="StatutReservation" id="1BkUvxC8O7KHi8QJaBKo-138">
           <mxCell parent="1BkUvxC8O7KHi8QJaBKo-131" style="swimlane;collapsible=0;fontStyle=0;align=center;fontSize=14;fontColor=#0F172A;startSize=26;spacingLeft=0;fillColor=#F8FAFC;strokeColor=#334155;childLayout=stackLayout;horizontal=1;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;marginBottom=0;stackSpacing=0;marginTop=5.5;shadow=0;swimlaneFillColor=#F8FAFC;" vertex="1">
-            <mxGeometry height="77.5" width="130.53" x="14.730000000000004" y="664" as="geometry" />
+            <mxGeometry height="77.5" width="130.53" x="14.730000000000004" y="660" as="geometry" />
           </mxCell>
         </UserObject>
         <UserObject label="CONFIRMEE" plantUmlId="mb_9" plantUmlBaseStyle="text;html=1;align=left;verticalAlign=middle;spacingLeft=6;spacingRight=4;overflow=hidden;rotatable=0;fillColor=none;strokeColor=none;fontSize=14;fontColor=#000000;fontStyle=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;" plantUmlBaseValue="CONFIRMEE" id="1BkUvxC8O7KHi8QJaBKo-139">
@@ -131,7 +131,7 @@
         </UserObject>
         <UserObject label="Passager" plantUmlId="cls_26" plantUmlBaseStyle="swimlane;collapsible=0;fontStyle=0;align=center;fontSize=14;fontColor=#0F172A;startSize=26;spacingLeft=0;fillColor=#F8FAFC;strokeColor=#334155;childLayout=stackLayout;horizontal=1;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;marginBottom=0;stackSpacing=0;marginTop=5.5;shadow=0;swimlaneFillColor=#F8FAFC;" plantUmlBaseValue="Passager" id="1BkUvxC8O7KHi8QJaBKo-156">
           <mxCell parent="1BkUvxC8O7KHi8QJaBKo-131" style="swimlane;collapsible=0;fontStyle=0;align=center;fontSize=14;fontColor=#0F172A;startSize=26;spacingLeft=0;fillColor=#F8FAFC;strokeColor=#334155;childLayout=stackLayout;horizontal=1;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;marginBottom=0;stackSpacing=0;marginTop=5.5;shadow=0;swimlaneFillColor=#F8FAFC;" vertex="1">
-            <mxGeometry height="134.5" width="146.73" x="74.89500000000004" y="250" as="geometry" />
+            <mxGeometry height="134.5" width="146.73" x="97.17500000000004" y="250" as="geometry" />
           </mxCell>
         </UserObject>
         <UserObject label="id : Long" plantUmlId="mb_27" plantUmlBaseStyle="text;html=1;align=left;verticalAlign=middle;spacingLeft=20;spacingRight=4;overflow=hidden;rotatable=0;fillColor=none;strokeColor=none;fontSize=14;fontColor=#000000;fontStyle=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;" plantUmlBaseValue="id : Long" id="1BkUvxC8O7KHi8QJaBKo-157">
@@ -530,11 +530,11 @@
           </mxCell>
         </UserObject>
         <UserObject label="effectue &gt;" plantUmlId="rel_105" plantUmlBaseStyle="endArrow=none;html=1;strokeColor=#334155;fontColor=#000000;fontSize=11;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0.32;entryY=0;entryDx=0;entryDy=0;curved=0;rounded=0;endSize=6;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;" plantUmlBaseValue="effectue &gt;" id="1BkUvxC8O7KHi8QJaBKo-235">
-          <mxCell edge="1" parent="1BkUvxC8O7KHi8QJaBKo-131" source="1BkUvxC8O7KHi8QJaBKo-156" style="endArrow=none;html=1;strokeColor=#334155;fontColor=#000000;fontSize=11;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.321;entryY=0.001;entryDx=0;entryDy=0;rounded=0;endSize=6;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;edgeStyle=orthogonalEdgeStyle;entryPerimeter=0;" target="1BkUvxC8O7KHi8QJaBKo-208">
+          <mxCell edge="1" parent="1BkUvxC8O7KHi8QJaBKo-131" source="1BkUvxC8O7KHi8QJaBKo-156" style="endArrow=none;html=1;strokeColor=#334155;fontColor=#000000;fontSize=11;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;rounded=0;endSize=6;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;edgeStyle=orthogonalEdgeStyle;" target="1BkUvxC8O7KHi8QJaBKo-208">
             <mxGeometry relative="1" as="geometry">
               <Array as="points">
-                <mxPoint x="170" y="385" />
-                <mxPoint x="170" y="803.86" />
+                <mxPoint x="170.5" y="590" />
+                <mxPoint x="208.8" y="590" />
               </Array>
             </mxGeometry>
           </mxCell>
@@ -593,13 +593,13 @@
           </mxCell>
         </UserObject>
         <UserObject label="" plantUmlId="rel_115" plantUmlBaseStyle="dashed=1;endArrow=open;html=1;strokeColor=#334155;fontColor=#000000;fontSize=11;exitX=0.4;exitY=1;exitDx=0;exitDy=0;entryX=0.69;entryY=0;entryDx=0;entryDy=0;curved=0;rounded=0;endSize=6;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;" plantUmlBaseValue="" id="1BkUvxC8O7KHi8QJaBKo-245">
-          <mxCell edge="1" parent="1BkUvxC8O7KHi8QJaBKo-131" source="1BkUvxC8O7KHi8QJaBKo-213" style="dashed=1;endArrow=open;html=1;strokeColor=#334155;fontColor=#000000;fontSize=11;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;rounded=0;endSize=6;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;edgeStyle=orthogonalEdgeStyle;" target="1BkUvxC8O7KHi8QJaBKo-138">
+          <mxCell edge="1" parent="1BkUvxC8O7KHi8QJaBKo-131" source="1BkUvxC8O7KHi8QJaBKo-213" style="dashed=1;endArrow=open;html=1;strokeColor=#334155;fontColor=#000000;fontSize=11;exitX=0;exitY=0.5;exitDx=0;exitDy=0;rounded=0;endSize=6;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;edgeStyle=orthogonalEdgeStyle;">
             <mxGeometry relative="1" as="geometry">
               <Array as="points">
-                <mxPoint x="70" y="882.8" />
-                <mxPoint x="70" y="760.06" />
-                <mxPoint x="80" y="760.06" />
+                <mxPoint x="70" y="882.78" />
+                <mxPoint x="70" y="741.56" />
               </Array>
+              <mxPoint x="70" y="741.5" as="targetPoint" />
             </mxGeometry>
           </mxCell>
         </UserObject>
