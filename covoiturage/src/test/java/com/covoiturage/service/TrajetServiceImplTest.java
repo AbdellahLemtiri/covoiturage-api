@@ -175,7 +175,7 @@ class TrajetServiceImplTest {
 
         assertThatThrownBy(() -> trajetService.terminerTrajet(100L, 1L))
                 .isInstanceOf(BusinessRuleException.class)
-                .hasMessageContaining("avant son heure de départ");
+                .hasMessageContaining("avant son heure de depart");
 
         verify(trajetRepository, never()).save(any());
     }

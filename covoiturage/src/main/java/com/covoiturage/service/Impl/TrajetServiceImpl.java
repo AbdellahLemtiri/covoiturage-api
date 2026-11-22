@@ -74,9 +74,15 @@ public class TrajetServiceImpl implements TrajetService {
             throw new BadRequestException("Le nombre de places proposees doit etre compris entre 1 et " + vehicule.getCapacite());
         }
 
+
+
+
         List<PointArretRequestDto> pointsTries = dto.pointsArret().stream()
                 .sorted(Comparator.comparing(PointArretRequestDto::ordre))
                 .toList();
+
+
+
 
         validerPointsArret(pointsTries);
 

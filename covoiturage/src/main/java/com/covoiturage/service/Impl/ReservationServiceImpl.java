@@ -2,10 +2,7 @@ package com.covoiturage.service.impl;
 
 import com.covoiturage.dto.request.ReservationRequestDto;
 import com.covoiturage.dto.response.ReservationResponseDto;
-import com.covoiturage.entity.Passager;
-import com.covoiturage.entity.PointArret;
-import com.covoiturage.entity.Reservation;
-import com.covoiturage.entity.Trajet;
+import com.covoiturage.entity.*;
 import com.covoiturage.enums.StatutReservation;
 import com.covoiturage.enums.StatutTrajet;
 import com.covoiturage.exception.BadRequestException;
@@ -24,9 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -48,6 +44,11 @@ public class ReservationServiceImpl implements ReservationService {
 
         Trajet trajet = trajetRepository.findByIdWithDetails(dto.trajetId()).orElseThrow(() -> new ResourceNotFoundException("Trajet introuvable avec l'id : " + dto.trajetId()));
 
+        if (trajet.getStatut() == StatutTrajet.COMPLET) {
+            log.warn("Réservation refusée : le trajet id={} est COMPLET", trajet.getId());
+            throw new BusinessRuleException("Ce trajet est complet, aucune place disponible");
+        }
+
         if (reservationRepository.existsByPassagerIdAndTrajetIdAndStatut(passager.getId(), trajet.getId(), StatutReservation.CONFIRMEE)) {
             log.warn("Réservation refusée  passager id={} a déjà une réservation confirmée sur trajet id={}", passager.getId(), trajet.getId());
             throw new BusinessRuleException("Vous avez déjà une réservation confirmée sur ce trajet");
@@ -59,6 +60,7 @@ public class ReservationServiceImpl implements ReservationService {
             log.warn("Réservation refusée montée ({}) après ou égale à descente ({}) ", dto.villeMontee(), dto.villeDescente());
             throw new BadRequestException("Le point de montee doit etre situe avant le point de descente sur le parcours");
         }
+
         int placesOccupees = reservationRepository.sumPlacesConfirmeesByTrajetId(trajet.getId());
         int placesRestantes = trajet.getPlacesProposees() - placesOccupees;
 
