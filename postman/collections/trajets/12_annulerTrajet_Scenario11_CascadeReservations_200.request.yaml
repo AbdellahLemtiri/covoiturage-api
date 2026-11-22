@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/trajets/1/annuler?conducteurId=1"
+method: PATCH
+order: 12000

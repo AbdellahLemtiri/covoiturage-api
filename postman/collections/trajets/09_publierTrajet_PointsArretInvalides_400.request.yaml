@@ -1,0 +1,35 @@
+$kind: http-request
+url: "{{baseUrl}}/trajets"
+method: POST
+order: 9000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "conducteurId": 1,
+      "vehiculeId": 1,
+      "placesProposees": 3,
+      "pointsArret": [
+        {
+          "ville": "Rabat",
+          "ordre": 0,
+          "heurePassage": "2026-12-01T17:00:00",
+          "prixDepuisDepart": 0.00
+        },
+        {
+          "ville": "Casablanca",
+          "ordre": 1,
+          "heurePassage": "2026-12-01T18:15:00",
+          "prixDepuisDepart": 80.00
+        },
+        {
+          "ville": "Settat",
+          "ordre": 2,
+          "heurePassage": "2026-12-01T19:15:00",
+          "prixDepuisDepart": 50.00
+        }
+      ]
+    }

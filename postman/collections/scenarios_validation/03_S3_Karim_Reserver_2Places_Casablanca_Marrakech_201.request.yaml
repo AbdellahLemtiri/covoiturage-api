@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{baseUrl}}/reservations"
+method: POST
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "passagerId": 2,
+      "trajetId": 1,
+      "villeMontee": "Casablanca",
+      "villeDescente": "Marrakech",
+      "nombrePlaces": 2
+    }

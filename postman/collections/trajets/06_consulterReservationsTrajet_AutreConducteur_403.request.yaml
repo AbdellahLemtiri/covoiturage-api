@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/trajets/1/reservations?conducteurId=2"
+method: GET
+order: 6000
